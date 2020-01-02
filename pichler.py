@@ -2,7 +2,12 @@ import sys
 import os
 import nabto
 import json
-import configparser
+try:
+	import configparser
+except:
+	# python2 compatibility
+	import ConfigParser
+	configparser = ConfigParser
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -12,14 +17,13 @@ class Pichler:
 		if not device or not user or not passwd:
 			config = configparser.ConfigParser()
 			config.read(os.path.join(package_dir, 'pichler.ini'))
-			cfg = config['pichler']
 
 			if not device:
-				device = cfg['device']
+				device = config.get('pichler', 'device')
 			if not user:
-				user = cfg['user']
+				user = config.get('pichler', 'user')
 			if not passwd:
-				passwd = cfg['pass']
+				passwd = config.get('pichler', 'pass')
 
 		if not '.' in device:
 			device += '.remote.lscontrol.dk'
