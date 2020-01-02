@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<unabto_queries 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.nabto.com/unabto/query_model.xsd">
+  <!-- New format of requests -->
+  <!-- Ping query -->
+  <query id="17" description="Ping" name="ping.json">
+    <request>
+      <parameter name="ping" type="uint32" />
+      <!--Always = 0x70696E67 -->
+    </request>
+    <response format="json">
+      <parameter name="Pong" type="uint32" />
+      <!-- Always = 0x706F6E67-->
+      <parameter name="Devicenumber" type="uint32" />
+      <parameter name="Model" type="uint32" />
+      <parameter name="Version HP" type="uint32" />
+			<parameter name="Version NP" type="uint32" />
+			<parameter name="Version HBDE" type="uint32" />
+			<parameter name="UserNames:" type="raw"  />
+    </response>
+  </query>
+  <!-- Admin CMD, Admin and Above only-->
+  <query id="6" description="Send Admin CMD" name="admincmd.json">
+    <request>
+      <parameter name="cmd" type="uint32" />
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint32" />
+    </response>
+  </query>
+  
+  <query id="7" description="Update Username" name="updateuser.json">
+  	<request>
+  		<parameter name="usernumber" type="uint8" />
+  		<parameter name="user" type="raw"/>
+  	</request>
+  	<response format="json">
+  		<parameter name="status" type="uint32" />
+  	</response>
+  </query>
+  <!-- System Update Commands -->
+  <query id="8" description="prepare for Flash" name="prepareUpdate.json">
+    <request>
+      <parameter name="fileid" type="uint8" />
+      <parameter name="filesize" type="uint32" />
+      <parameter name="crc32" type="uint32" />
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint32" />
+    </response>
+  </query>
+  <!-- EEPROM Requests MASTER Only-->
+  <!-- Read -->
+  <query id="11" description="Read EEPROM Raw" name="eepReadRaw.json">
+    <request>
+      <parameter name="address" type="uint32"/>
+      <parameter name="length" type="uint32"/>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+    </response>
+  </query>
+  <!-- Write -->
+  <query id="12" description="Write EEPROM Raw" name="eepWriteRaw.json">
+    <request>
+      <parameter name="address" type="uint32"/>
+      <parameter name="length" type="uint32"/>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+    </response>
+  </query>
+  <!-- FLASH Request MASTER Only-->
+  <!-- Read -->
+  <query id="21" description="Read Flash" name="flashRead.json">
+    <request>
+      <parameter name="address" type="uint32"/>
+      <parameter name="length" type="uint32"/>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+    </response>
+  </query>
+  <!-- Write -->
+  <query id="22" description="Write Flash" name="flashWrite.json">
+    <request>
+      <parameter name="address" type="uint32"/>
+      <parameter name="length" type="uint32"/>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+    </response>
+  </query>
+  <!-- Setpoint Request -->
+  <!-- Read -->
+  <query id="41" description="Read Setpoint Values" name="setpointReadValue.json">
+    <request>
+      <parameter name="obj" type="uint8"/>
+      <parameter name="address" type="uint32"/>
+      <parameter name="length" type="uint16"/>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+      <list name="data">
+        <parameter name="value" type="int16"/>
+      </list>
+    </response>
+  </query>
+  <query id="42" description="Read List of Setpoint Values" name="setpointReadListValue.json">
+    <request>
+      <list name="list">
+        <parameter name="obj" type="uint8"/>
+        <parameter name="address" type="uint16"/>
+      </list>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+      <list name="data">
+        <parameter name="value" type="int16"/>
+      </list>
+    </response>
+  </query>
+  <!-- Write -->
+  <query id="43" description="Write a Setpoint values" name="setpointWriteValue.json">
+    <request>
+      <list name="list">
+        <parameter name="obj" type="uint8"/>
+        <parameter name="address" type="uint32"/>
+        <parameter name="value" type="uint16"/>
+      </list>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8" />
+    </response>
+  </query>
+  <!-- Datapoint request-->
+  <!-- Read -->
+  <query id="44" description="Read Datapoint Values" name="datapointReadValue.json">
+    <request>
+      <parameter name="obj" type="uint8"/>
+      <parameter name="address" type="uint32"/>
+      <parameter name="length" type="uint16"/>
+    </request>
+    <response format="json">
+      <parameter name="status" type="uint8"/>
+      <list name="data">
+        <parameter name="value" type="int16"/>
+      </list>
+    </response>
+  </query>
+  <query id="45" description="Get list of Datapoint" name="datapointReadListValue.json">
+    <request>
+      <list name="list">
+        <parameter name="obj" type="uint8" />
+        <parameter name="address" type="uint32" />
+      </list>
+    </request>
+    <response format="json">
+      <list name="data">
+        <parameter name="value" type="int16" />
+      </list>
+    </response>
+  </query>
+  <!-- get debug info-->
+  <query id="666" description="get tekst info return from PIC" name="getdebug.json">
+    <request>
+      <parameter name="id" type="uint8" />
+    </request>
+    <response format="json">
+      <parameter name="info" type="raw" representation="hex"/>
+    </response>
+  </query>
+  <!-- write debug info-->
+  <query id="667" description="write tekst info to from PIC" name="writetdebug.json">
+    <request>
+      <parameter name="id" type="raw" representation="hex" />
+    </request>
+    <response format="json">
+      <parameter name="info" type="raw" representation="hex" />
+    </response>
+  </query>
+</unabto_queries> 
