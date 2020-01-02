@@ -78,7 +78,7 @@ class Pichler:
 	# output: real value of given datapoint (scaled appropriately)
 	def GetDatapoint(self, dp):
 		item = self.DP[dp]
-		return self.DatapointReadValue(item.addr[0], item.addr[1]) * item.scale
+		return self.DatapointRawReadValue(item.addr[0], item.addr[1]) * item.scale
 
 	# Get values of multiple datapoints
 	# dps: list of datapoint names (see `DP` dict)
@@ -88,7 +88,7 @@ class Pichler:
 		for dp in dps:
 			item = self.DP[dp]
 			l.append([item.addr[0], item.addr[1]])
-		r = self.DatapointReadListValues(l)
+		r = self.DatapointRawReadListValues(l)
 		for i in range(len(dps)):
 			item = self.DP[dps[i]]
 			r[i] = r[i] * item.scale
@@ -103,18 +103,18 @@ class Pichler:
 	def Ping(self):
 		return self.RpcInvoke('ping', 'ping=1885957735')
 
-	def DatapointReadValues(self, address, obj, length):
+	def DatapointRawReadValues(self, address, obj, length):
 		response = self.RpcInvoke('datapointReadValue', 'address=%d&obj=%d&length=%d' % (address, obj, length))
 		if response:
 			return [i['value'] for i in response['data']]
 		return []
 
-	def DatapointReadValue(self, address, obj=0):
-		return self.DatapointReadValues(address, obj, 1)[0]
+	def DatapointRawReadValue(self, address, obj=0):
+		return self.DatapointRawReadValues(address, obj, 1)[0]
 
 	# input : list of [addr, obj] pairs
-	# output: list of values for each pair in original order
-	def DatapointReadListValues(self, lst):
+	# output: list of raw values for each pair in original order
+	def DatapointRawReadListValues(self, lst):
 		l = [{'address': i[0], 'obj': i[1]} for i in lst]
 		request = {'request': {'list': l}}
 		response = self.RpcInvoke('datapointReadListValue', 'json=%s' % json.dumps(request))
@@ -122,18 +122,18 @@ class Pichler:
 			return [i['value'] for i in response['data']]
 		return []
 
-	def SetpointReadValues(self, address, obj, length):
+	def SetpointRawReadValues(self, address, obj, length):
 		response = self.RpcInvoke('setpointReadValue', 'address=%d&obj=%d&length=%d' % (address, obj, length))
 		if response:
 			return [i['value'] for i in response['data']]
 		return []
 
-	def SetpointReadValue(self, address, obj=0):
-		return self.SetpointReadValues(address, obj, 1)[0]
+	def SetpointRawReadValue(self, address, obj=0):
+		return self.SetpointRawReadValues(address, obj, 1)[0]
 
 	# input : list of [addr, obj] pairs
-	# output: list of values for each pair in original order
-	def SetpointReadListValues(self, lst):
+	# output: list of raw values for each pair in original order
+	def SetpointRawReadListValues(self, lst):
 		l = [{'address': i[0], 'obj': i[1]} for i in lst]
 		request = {'request': {'list': l}}
 		response = self.RpcInvoke('setpointReadListValue', 'json=%s' % json.dumps(request))
