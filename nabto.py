@@ -11,8 +11,6 @@ import os
 import json
 from ctypes import *
 
-package_dir = os.path.dirname(os.path.abspath(__file__))
-
 class Client:
 	"""
 	Simple wrapper for Nabto client library (currently only limited session/RPC functionality)
@@ -24,6 +22,7 @@ class Client:
 		else:
 			library = 'libnabto_client_api.so'
 
+		package_dir = os.path.dirname(os.path.abspath(__file__))
 		self.client = cdll.LoadLibrary(os.path.join(package_dir, 'libs', library))
 
 		# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoStartup(const char* nabtoHomeDir);
@@ -35,7 +34,6 @@ class Client:
 		# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoShutdown(void);
 		self.client.nabtoShutdown()
 
-	# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoGetLocalDevices(char*** devices, int* numberOfDevices);
 	def GetLocalDevices(self):
 		"""
 		Enumerate local Nabto devices
@@ -47,6 +45,7 @@ class Client:
 		"""
 		devices = pointer(c_char_p())
 		count = c_int(0)
+		# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoGetLocalDevices(char*** devices, int* numberOfDevices);
 		self.client.nabtoGetLocalDevices(pointer(devices), pointer(count))
 		if (count.value != 0):
 			return [devices.contents.value]
@@ -97,8 +96,8 @@ class Client:
 		def __init__(self, client, user, pwd):
 			self.client = client
 
-			# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoOpenSession(nabto_handle_t* session, const char* id, const char* password);
 			session = c_void_p()
+			# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoOpenSession(nabto_handle_t* session, const char* id, const char* password);
 			status = self.client.nabtoOpenSession(pointer(session), user.encode(), pwd.encode())
 			if status == 5:
 				status = self.client.nabtoCreateProfile(user.encode(), pwd.encode())
@@ -115,7 +114,6 @@ class Client:
 		def __del__(self):
 			self.client.nabtoCloseSession(self.session)
 
-
 		def RpcSetDefaultInterface(self, interfaceDefinition):
 			"""
 			Assign RPC interface definition to session
@@ -125,8 +123,8 @@ class Client:
 			interfaceDefinition : str
 				XML with RPC interface definition
 			"""
-			# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoRpcSetDefaultInterface(nabto_handle_t session, const char* interfaceDefinition, char** errorMessage);
 			err = c_char_p()
+			# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoRpcSetDefaultInterface(nabto_handle_t session, const char* interfaceDefinition, char** errorMessage);
 			if self.client.nabtoRpcSetDefaultInterface(self.session, interfaceDefinition.encode(), pointer(err)) != 0:
 				print('nabtoRpcSetDefaultInterface error: %s' % err)
 
@@ -145,7 +143,7 @@ class Client:
 				RPC response
 			"""
 			out = c_char_p()
-			status = self.client.nabtoRpcInvoke(self.session, nabtoUrl.encode(), pointer(out))
+			self.client.nabtoRpcInvoke(self.session, nabtoUrl.encode(), pointer(out))
 
 			if out:
 				response = out.value

@@ -14,8 +14,6 @@ except:
 	import ConfigParser
 	configparser = ConfigParser
 
-package_dir = os.path.dirname(os.path.abspath(__file__))
-
 class Pichler:
 	"""
 	A class for accessing Pichler heat pump unit.
@@ -83,6 +81,8 @@ class Pichler:
 
 		If any of these parameters is not provided, value from `pichler.ini` file is used instead.
 		"""
+		package_dir = os.path.dirname(os.path.abspath(__file__))
+
 		if not device or not user or not passwd:
 			config = configparser.ConfigParser()
 			config.read(os.path.join(package_dir, 'pichler.ini'))
