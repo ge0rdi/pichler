@@ -1,3 +1,7 @@
+"""
+Show basic runtime info from PKOM4 unit
+"""
+
 import pichler
 
 device = pichler.Pichler()

@@ -1,3 +1,11 @@
+"""
+Helper module for working with Nabto communication client
+
+More info on Nabto can be found here:
+https://www.nabto.com/developer
+https://downloads.nabto.com/assets/docs/TEN025 Writing a Nabto API client application.pdf
+"""
+
 import sys
 import os
 import json
@@ -6,6 +14,9 @@ from ctypes import *
 package_dir = os.path.dirname(os.path.abspath(__file__))
 
 class Client:
+	"""
+	Simple wrapper for Nabto client library (currently only limited session/RPC functionality)
+	"""
 
 	def __init__(self, home):
 		if sys.platform == 'win32':
@@ -26,6 +37,14 @@ class Client:
 
 	# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoGetLocalDevices(char*** devices, int* numberOfDevices);
 	def GetLocalDevices(self):
+		"""
+		Enumerate local Nabto devices
+		
+		Returns
+		-------
+		list
+			Found devices
+		"""
 		devices = pointer(c_char_p())
 		count = c_int(0)
 		self.client.nabtoGetLocalDevices(pointer(devices), pointer(count))
@@ -35,14 +54,46 @@ class Client:
 		return []
 
 	def CreateProfile(self, user, pwd):
+		"""
+		Create profile that can be used to establish a session to device
+		
+		Parameters
+		----------
+		user : str
+			User name of account associated with device
+		pwd : str
+			Password for given account
+		
+		Returns
+		-------
+		int
+			Nabto status (0=success)
+		"""
 		# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoCreateProfile(const char* email, const char* password);
 		return self.client.nabtoCreateProfile(user.encode(), pwd.encode())
 
 	def OpenSession(self, user, pwd):
+		"""
+		Open session to device
+		
+		Parameters
+		----------
+		user : str
+			User name of account associated with device
+		pwd : str
+			Password for given account
+		
+		Returns
+		-------
+		Client.Session
+			Session object
+		"""
 		return self.Session(self.client, user, pwd)
 
 	class Session:
-
+		"""
+		A class that represents opened session
+		"""
 		def __init__(self, client, user, pwd):
 			self.client = client
 
@@ -66,12 +117,33 @@ class Client:
 
 
 		def RpcSetDefaultInterface(self, interfaceDefinition):
+			"""
+			Assign RPC interface definition to session
+			
+			Parameters
+			----------
+			interfaceDefinition : str
+				XML with RPC interface definition
+			"""
 			# NABTO_DECL_PREFIX nabto_status_t NABTOAPI nabtoRpcSetDefaultInterface(nabto_handle_t session, const char* interfaceDefinition, char** errorMessage);
 			err = c_char_p()
 			if self.client.nabtoRpcSetDefaultInterface(self.session, interfaceDefinition.encode(), pointer(err)) != 0:
 				print('nabtoRpcSetDefaultInterface error: %s' % err)
 
 		def RpcInvoke(self, nabtoUrl):
+			"""
+			Invoke RPC command
+			
+			Parameters
+			----------
+			nabtoUrl : str
+				URL that contains RPC command along with command parameters
+			
+			Returns
+			-------
+			dict
+				RPC response
+			"""
 			out = c_char_p()
 			status = self.client.nabtoRpcInvoke(self.session, nabtoUrl.encode(), pointer(out))
 
