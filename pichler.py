@@ -27,6 +27,12 @@ class Pichler:
 
 	GetDatapoints(dps)
 		Get values of multiple datapoints
+
+	GetSetpoint(dp)
+		Get value of single setpoint
+
+	GetSetpoints(sps)
+		Get values of multiple setpoints
 	"""
 	# datapoint definitions
 	DPItem = namedtuple('DPItem', ['addr', 'scale'])
@@ -62,6 +68,27 @@ class Pichler:
 		'Ventilation.Level': DPItem((41, 1), 1),
 		'Ventilation.Supply': DPItem((22, 0), 0.1),
 		'Ventilation.Extract': DPItem((23, 0), 0.1),
+	}
+
+	SPItem = namedtuple('SPItem', ['addr_r', 'addr_w', 'limits', 'scale'])
+	SP = {
+		'CO2.Avail': SPItem((16, 0), (42, 0), (0, 3), 1),
+		'FilterChange': SPItem((18, 2), (652, 0), (0, 65535), 1.0/12),
+		'EquipmentType': SPItem((5, 0), (20, 0), (0, 1), 1),
+		'HotWater.E.Heating': SPItem((136, 0), (282, 0), (0, 1), 1),			# 0=off, 1=on
+		'HotWater.Fast.Heating': SPItem((106, 0), (222, 0), (0, 1), 1),			# 0=off, 1=on
+		'HotWater.Temperature': SPItem((129, 0), (268, 0), (20, 75), 0.01),
+		'KWH.COP.Reset.Day': SPItem((15, 2), (646, 0), (0, 65535), 1),
+		'KWH.COP.Reset.Month': SPItem((16, 2), (648, 0), (0, 65535), 1),
+		'KWH.COP.Reset.Year': SPItem((17, 2), (650, 0), (0, 65535), 1),
+		'OperatingMode.Holiday.Day': SPItem((2, 6), (936, 0), (0, 59), 1),
+		'OperatingMode.Holiday.Month': SPItem((1, 6), (934, 0), (0, 23), 1),
+		'OperatingMode.Holiday.Year': SPItem((0, 6), (932, 0), (0, 99), 1),
+		'OperatingMode': SPItem((0, 0), (0, 10), (0, 9), 1),					# 0=off, 1=summer, 2=winter, 3=auto
+		'Temperature.Normal': SPItem((10, 0), (30, 0), (10, 30), 0.01),
+		'Temperature.ActiveCooling': SPItem((19, 0), (48, 0), (15, 40), 0.01),
+		'ActiveCooling.Mode': SPItem((9, 0), (28, 0), (0, 2), 1),				# 0=off, 1=on, 2=eco
+		'Ventilation.Level': SPItem((46, 0), (102, 0), (0, 4), 1),				# 0=auto, 1=level1, 2=level2, 3=level3, 4=level4
 	}
 
 	def __init__(self, device=None, user=None, passwd=None):
@@ -142,6 +169,45 @@ class Pichler:
 		r = self.DatapointRawReadListValues(l)
 		for i in range(len(dps)):
 			item = self.DP[dps[i]]
+			r[i] = r[i] * item.scale
+		return r
+
+	def GetSetpoint(self, sp):
+		"""Get value of single setpoint
+		
+		Parameters
+		----------
+		sp : str
+			Setpoint name (see `Pichler.SP` dict)
+
+		Returns
+		-------
+		int, float
+			Real value of setpoint (scaled appropriately)
+		"""
+		item = self.SP[sp]
+		return self.SetpointRawReadValue(item.addr_r[0], item.addr_r[1]) * item.scale
+
+	def GetSetpoints(self, sps):
+		"""Get values of multiple setpoints
+		
+		Parameters
+		----------
+		sps : list
+			List of setpoint names (see `Pichler.SP` dict)
+		
+		Returns
+		-------
+		list
+			Real values of given setpoints (same order as input list)
+		"""
+		l = []
+		for sp in sps:
+			item = self.SP[sp]
+			l.append([item.addr_r[0], item.addr_r[1]])
+		r = self.SetpointRawReadListValues(l)
+		for i in range(len(sps)):
+			item = self.SP[sps[i]]
 			r[i] = r[i] * item.scale
 		return r
 
