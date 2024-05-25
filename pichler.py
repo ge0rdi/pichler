@@ -7,12 +7,6 @@ import os
 import nabto
 import json
 from collections import namedtuple
-try:
-	import configparser
-except:
-	# python2 compatibility
-	import ConfigParser
-	configparser = ConfigParser
 
 class Pichler:
 	"""
@@ -106,20 +100,17 @@ class Pichler:
 		passwd : str, optional
 			Password for given account, by default None
 
-		If any of these parameters is not provided, value from `pichler.ini` file is used instead.
+		If any of these parameters is not provided, value from environment variable is used instead.
 		"""
 		package_dir = os.path.dirname(os.path.abspath(__file__))
 
 		if not device or not user or not passwd:
-			config = configparser.ConfigParser()
-			config.read(os.path.join(package_dir, 'pichler.ini'))
-
 			if not device:
-				device = config.get('pichler', 'device')
+				device = os.environ['PICHLER_DEVICE_ID']
 			if not user:
-				user = config.get('pichler', 'user')
+				user = os.environ['PICHLER_USER']
 			if not passwd:
-				passwd = config.get('pichler', 'pass')
+				passwd = os.environ['PICHLER_PASSWORD']
 
 		if not '.' in device:
 			device += '.remote.lscontrol.dk'
