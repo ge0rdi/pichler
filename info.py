@@ -49,9 +49,30 @@ print('  Bottom           : %.2f C' % device.GetDatapoint('Temperature.Water.Bot
 print('')
 
 print('Various')
-print('  Status bits      : %s'      % hex(device.GetDatapoint('StatusBits') & 0xffff))
+status = device.GetDatapoint('StatusBits') & 0xffff
+print('  Status bits      : %s'      % hex(status))
+if status & 0x0001:
+	print('                     Water heating')
+if status & 0x0004:
+	print('                     Heating')
+if status & 0x0008:
+	print('                     Cooling')
+if status & 0x0040:
+	print('                     Legionella protection')
+if status & 0x0100:
+	print('                     E-booster')
+if status & 0x0200:
+	print('                     E-heating')
+if status & 0x2000:
+	print('                     Defrost')
+
 print('  CO2 level        : %d ppm'  % device.GetDatapoint('CO2'))
-print('  Malfunction      : %d'      % device.GetDatapoint('Malfunction'))
+malfunction = device.GetDatapoint('Malfunction')
+print('  Malfunction      : %d'      % malfunction)
+if (malfunction == 256):
+	print('                     Defrost time exceeded')
+if (malfunction == 16384):
+	print('                     4way valve error')
 print('  Filter change    : %d days' % device.GetSetpoint('FilterChange'))
 print('  SCOP             : %.2f'    % device.GetDatapoint('SCOP'))
 print('  HP COP           : %.2f'    % device.GetDatapoint('HP.COP'))
