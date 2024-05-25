@@ -84,7 +84,7 @@ class Pichler:
 		'OperatingMode.Holiday.Day': SPItem((2, 6), (936, 0), (0, 59), 1),
 		'OperatingMode.Holiday.Month': SPItem((1, 6), (934, 0), (0, 23), 1),
 		'OperatingMode.Holiday.Year': SPItem((0, 6), (932, 0), (0, 99), 1),
-		'OperatingMode': SPItem((0, 0), (0, 10), (0, 9), 1),					# 0=off, 1=summer, 2=winter, 3=auto
+		'OperatingMode': SPItem((0, 0), (10, 0), (0, 9), 1),					# 0=off, 1=summer, 2=winter, 3=auto
 		'Temperature.Normal': SPItem((10, 0), (30, 0), (10, 30), 0.01),
 		'Temperature.ActiveCooling': SPItem((19, 0), (48, 0), (15, 40), 0.01),
 		'ActiveCooling.Mode': SPItem((9, 0), (28, 0), (0, 2), 1),				# 0=off, 1=on, 2=eco
