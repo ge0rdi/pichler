@@ -211,6 +211,32 @@ class Pichler:
 			r[i] = r[i] * item.scale
 		return r
 
+	def SetSetpoint(self, sp, value):
+		"""Set value to single setpoint
+		
+		Parameters
+		----------
+		sp : str
+			Setpoint name (see `Pichler.SP` dict)
+		value : int/float
+			Value to set
+		"""
+		self.SetSetpoints([[sp, value]])
+
+	def SetSetpoints(self, sps):
+		"""Set values to multiple setpoints
+		
+		Parameters
+		----------
+		sps : list
+			List of [name, value] pairs (see `Pichler.SP` dict)
+		"""
+		l = []
+		for sp in sps:
+			item = self.SP[sp[0]]
+			l.append([item.addr_w[0], item.addr_w[1], int(sp[1] / item.scale)])
+		self.SetpointRawWriteListValues(l)
+
 	def RpcInvoke(self, command, params):
 		"""
 		Invoke RPC command to device
@@ -368,3 +394,17 @@ class Pichler:
 		if response:
 			return [i['value'] for i in response['data']]
 		return []
+
+	def SetpointRawWriteListValues(self, lst):
+		"""
+		Write raw values to multiple setpoints
+		
+		Parameters
+		----------
+		lst : list
+			List of [address, object, value] tuples of setpoints to write
+		
+		"""
+		l = [{'address': i[0], 'obj': i[1], 'value': i[2]} for i in lst]
+		request = {'request': {'list': l}}
+		self.RpcInvoke('setpointWriteValue', 'json=%s' % json.dumps(request))
