@@ -25,3 +25,7 @@ Data will be read and published every minute.
 
 To run `collect.py` in background use:  
 `python -u collect.py > collect.log 2>&1 &`
+
+## Running in Docker on RPi
+* Fill environment variables in `docker-compose.yml`
+* Run `docker compose up -d pichler`

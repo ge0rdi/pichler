@@ -1,0 +1,14 @@
+services:
+  pichler:
+    build: .
+    container_name: pichler
+    environment:
+#      - TZ=
+#      - MQTT_HOST=
+#      - PICHLER_DEVICE_ID=
+#      - PICHLER_USER=
+#      - PICHLER_PASSWORD=
+    volumes:
+      - ./logs:/logs
+#    network_mode: "host"
+    restart: unless-stopped
