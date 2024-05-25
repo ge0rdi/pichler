@@ -34,6 +34,7 @@ print('Air flow')
 print('  Level            : %d'        % device.GetDatapoint('Ventilation.Level'))
 print('  Supply           : %.2f m3/h' % device.GetDatapoint('Ventilation.Supply'))
 print('  Extract          : %.2f m3/h' % device.GetDatapoint('Ventilation.Extract'))
+print('  Balance          : %d%%' % device.SetpointRawReadValue(45, 0))
 print('')
 
 print('Air temperature')
